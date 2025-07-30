@@ -1,32 +1,44 @@
 'use client';
 
-import { useRef } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import debounce from 'lodash.debounce';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
+import { useCustomers } from '@/context/customerContext';
 
-export function Search({ callback, className }) {
-  const inputRef = useRef(null);
+export function Search({ className }) {
+  const { setSearchParams, searchParams } = useCustomers();
+  const [value, setValue] = useState(searchParams.query);
+  const callback = useCallback(
+    (value) => setSearchParams({ query: value }),
+    [setSearchParams]
+  );
+  const debouncedSetSearchParams = useMemo(() => debounce(callback, 300), [callback]);
+
+  const onChange = (value) => {
+    debouncedSetSearchParams(value);
+    setValue(value);
+  };
+  
   return (
-    <div className="flex items-center gap-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div className="flex items-center gap-2 border border-gray-300 rounded-md focus:outline-none">
       <input
         type="text"
         placeholder="Search customers..."
         className={cn('w-full px-4 py-2 focus:outline-none ', className)}
-        onChange={debounce((e) => callback(e.target.value), 300)}
-        ref={inputRef}
+        onChange={(e) => onChange(e.target.value)}
+        value={value}
       />
-      {inputRef.current?.value && (
+      {value && (
         <Button
           variant="ghost"
           onClick={() => {
-            inputRef.current.value = '';
-            callback('');
+            onChange('');
           }}
         >
           &times;
         </Button>
       )}
     </div>
-  );
+  );  
 }

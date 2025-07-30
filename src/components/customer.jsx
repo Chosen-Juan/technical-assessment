@@ -27,7 +27,7 @@ export const TableHeaders = () => (
 export const CustomerRowsSkeleton = ({ currentLength }) => {
   const row = Array.from({ length: 6 }).map((_, i) => (
     <TableCell key={`loader-${i}`}>
-      <div className="h-8 w-full bg-gray-200 rounded-md animate-pulse" />
+      <div className="h-8 w-full min-w-32 bg-gray-200 rounded-md animate-pulse" />
     </TableCell>
   ));
 
@@ -39,13 +39,8 @@ export const CustomerRowsSkeleton = ({ currentLength }) => {
 };
 
 export const CustomerRows = () => {
-  const { customers, setSearchParams } = useCustomers();
-  const onClickStatus = (status) => {
-    setSearchParams({ status });
-  };
-  const onClickIndustry = (industry) => {
-    setSearchParams({ industry });
-  };
+  const { customers } = useCustomers();
+
   return (
     <TableBody>
       {customers.map((customer) => (
@@ -57,10 +52,10 @@ export const CustomerRows = () => {
               {customer.contact.email}
             </div>
           </TableCell>
-          <TableCell onClick={() => onClickIndustry(customer.industry)}>
+          <TableCell>
             {customer.industry}
           </TableCell>
-          <TableCell onClick={() => onClickStatus(customer.status)}>
+          <TableCell>
             <span
               className={`px-2 py-1 rounded-full text-xs ${getStatusClass(customer.status)}`}
             >
